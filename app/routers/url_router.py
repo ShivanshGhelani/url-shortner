@@ -5,7 +5,7 @@ from typing import Optional
 from datetime import datetime
 from pathlib import Path
 
-from app.services.url_service import URLService
+from ..services.url_service import URLService
 from app.core.dependencies import get_url_service
 
 router = APIRouter()

@@ -4,7 +4,7 @@ from typing import Optional, List
 from datetime import datetime
 
 from app.models.url_models import URLCreate, URLResponse, URLInfo, URLStats
-from app.services.url_service import URLService
+from ..services.url_service import URLService
 from app.core.dependencies import get_url_service
 
 router = APIRouter()

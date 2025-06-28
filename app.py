@@ -2,49 +2,11 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-import os
-import sys
 from pathlib import Path
 
-# Add current directory and app directory to Python path for imports
-current_dir = Path(__file__).parent
-sys.path.insert(0, str(current_dir))
-sys.path.insert(0, str(current_dir / "app"))
-
-try:
-    from app.routers import url_router, api_router
-    from app.core.config import settings
-    from app.core.dependencies import get_url_service
-except ImportError:
-    # Fallback for Vercel serverless environment - import directly from files
-    try:
-        import importlib.util
-        
-        # Load url_router
-        spec = importlib.util.spec_from_file_location("url_router", current_dir / "app" / "routers" / "url_router.py")
-        url_router = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(url_router)
-        
-        # Load api_router  
-        spec = importlib.util.spec_from_file_location("api_router", current_dir / "app" / "routers" / "api_router.py")
-        api_router = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(api_router)
-        
-        # Load config
-        spec = importlib.util.spec_from_file_location("config", current_dir / "app" / "core" / "config.py")
-        config_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(config_module)
-        settings = config_module.settings
-        
-        # Load dependencies
-        spec = importlib.util.spec_from_file_location("dependencies", current_dir / "app" / "core" / "dependencies.py")
-        deps_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(deps_module)
-        get_url_service = deps_module.get_url_service
-        
-    except Exception as e:
-        print(f"Import error: {e}")
-        raise
+from app.routers import url_router, api_router
+from app.core.config import settings
+from app.core.dependencies import get_url_service
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -77,7 +39,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "Universal URL Shortener",
-        "version": "1.0.0"
+        "version": settings.VERSION
     }
 
 @app.get("/", response_class=HTMLResponse)

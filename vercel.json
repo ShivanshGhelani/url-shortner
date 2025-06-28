@@ -28,10 +28,5 @@
     "PYTHONPATH": ".",
     "HOST": "0.0.0.0",
     "PORT": "8000"
-  },
-  "functions": {
-    "app.py": {
-      "maxDuration": 30
-    }
   }
 }

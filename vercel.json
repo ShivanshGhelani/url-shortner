@@ -25,8 +25,9 @@
     }
   ],
   "env": {
-    "PYTHONPATH": ".",
+    "PYTHONPATH": "/var/task:/var/task/app",
     "HOST": "0.0.0.0",
-    "PORT": "8000"
+    "PORT": "8000",
+    "VERCEL": "1"
   }
 }

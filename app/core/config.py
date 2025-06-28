@@ -12,7 +12,10 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     
     # URL settings
-    BASE_URL: str = os.getenv("VERCEL_URL", f"http://{HOST}:{PORT}")
+    BASE_URL: str = (
+        f"https://{os.getenv('VERCEL_URL', '')}" if os.getenv("VERCEL_URL") 
+        else os.getenv("BASE_URL", f"http://localhost:{8000}")
+    )
     SHORT_CODE_LENGTH: int = 6
     
     # Storage settings

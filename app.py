@@ -3,11 +3,22 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 import os
+import sys
 from pathlib import Path
 
-from app.routers import url_router, api_router
-from app.core.config import settings
-from app.core.dependencies import get_url_service
+# Add current directory to Python path for imports
+sys.path.append(str(Path(__file__).parent))
+
+try:
+    from app.routers import url_router, api_router
+    from app.core.config import settings
+    from app.core.dependencies import get_url_service
+except ImportError:
+    # Fallback for Vercel serverless environment
+    import app.routers.url_router as url_router
+    import app.routers.api_router as api_router
+    from app.core.config import settings
+    from app.core.dependencies import get_url_service
 
 # Initialize FastAPI app
 app = FastAPI(

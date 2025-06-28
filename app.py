@@ -3,8 +3,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pathlib import Path
+import sys
 
-from app.routers import url_router, api_router
+# Add the project root to Python path for package imports
+current_dir = Path(__file__).parent
+project_root = current_dir
+sys.path.insert(0, str(project_root))
+
+# Import routers and core modules directly from the 'app' directory
+from app.routers.url_router import router as url_router
+from app.routers.api_router import router as api_router
 from app.core.config import settings
 from app.core.dependencies import get_url_service
 
@@ -30,8 +38,8 @@ templates = Jinja2Templates(directory=BASE_DIR / "app" / "templates")
 url_service = get_url_service()
 
 # Include routers
-app.include_router(url_router.router)
-app.include_router(api_router.router, prefix="/api")
+app.include_router(url_router)
+app.include_router(api_router, prefix="/api")
 
 @app.get("/health")
 async def health_check():

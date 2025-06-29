@@ -30,11 +30,5 @@
     "PORT": "8000",
     "VERCEL": "1",
     "BASE_URL": "https://shortyurl-woad.vercel.app"
-
-  },
-  "functions": {
-    "vercel_app.py": {
-      "maxDuration": 30
-    }
   }
 }

@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "app.py",
+      "src": "vercel_app.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -21,13 +21,20 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/app.py"
+      "dest": "/vercel_app.py"
     }
   ],
   "env": {
     "PYTHONPATH": "/var/task:/var/task/app",
     "HOST": "0.0.0.0",
     "PORT": "8000",
-    "VERCEL": "1"
+    "VERCEL": "1",
+    "BASE_URL": "https://shortyurl-woad.vercel.app
+"
+  },
+  "functions": {
+    "vercel_app.py": {
+      "maxDuration": 30
+    }
   }
 }

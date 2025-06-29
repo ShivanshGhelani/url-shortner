@@ -5,8 +5,16 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 import uvicorn
 import os
 from pathlib import Path
+import sys
 
-from app.routers import url_router, api_router
+# Add the project root to Python path for package imports
+current_dir = Path(__file__).parent
+project_root = current_dir
+sys.path.insert(0, str(project_root))
+
+# Import routers and core modules directly from the 'app' directory
+from app.routers.url_router import router as url_router
+from app.routers.api_router import router as api_router
 from app.core.config import settings
 from app.core.dependencies import get_url_service
 
@@ -14,7 +22,9 @@ from app.core.dependencies import get_url_service
 app = FastAPI(
     title="Universal URL Shortener",
     description="A comprehensive URL shortening service supporting all types of URLs",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # Get the directory where this file is located
@@ -30,8 +40,17 @@ templates = Jinja2Templates(directory=BASE_DIR / "app" / "templates")
 url_service = get_url_service()
 
 # Include routers
-app.include_router(url_router.router)
-app.include_router(api_router.router, prefix="/api")
+app.include_router(url_router)
+app.include_router(api_router, prefix="/api")
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring"""
+    return {
+        "status": "healthy",
+        "service": "Universal URL Shortener",
+        "version": settings.VERSION
+    }
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -49,20 +68,15 @@ async def home(request: Request):
 
 @app.get("/{short_code}")
 async def redirect_url(request: Request, short_code: str, password: str = None):
-    """Redirect to original URL"""
-    print(f"🔍 Looking for short_code: '{short_code}'")
-    print(f"📁 Available codes: {list(url_service.urls.keys())}")
-    print(f"💾 Storage file: {url_service.storage_file}")
+    """Redirect to original URL or show password form if needed"""
     
     # First check if URL exists and if it needs password
     url_info = url_service.get_url_info(short_code)
     if "error" in url_info:
-        print(f"❌ Error: {url_info['error']}")
         raise HTTPException(status_code=404, detail="URL not found")
     
     # If URL requires password but none provided, show password form
     if url_info.get("has_password") and not password:
-        print(f"🔒 Password required for '{short_code}', showing password form")
         return templates.TemplateResponse(
             "password_form.html",
             {"request": request, "short_code": short_code}
@@ -73,23 +87,19 @@ async def redirect_url(request: Request, short_code: str, password: str = None):
     
     if "error" in result:
         if result["error"] == "Invalid password":
-            print(f"🔒 Invalid password for '{short_code}'")
             return templates.TemplateResponse(
                 "password_form.html",
                 {"request": request, "short_code": short_code, "error": "Invalid password"}
             )
         else:
-            print(f"❌ Error: {result['error']}")
             raise HTTPException(status_code=404, detail="URL not found")
     
-    print(f"✅ Redirecting to: {result['long_url']}")
     return RedirectResponse(url=result["long_url"], status_code=302)
 
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup"""
     print("🚀 Universal URL Shortener started!")
-    print(f"📊 Dashboard: http://{settings.HOST}:{settings.PORT}")
 
 if __name__ == "__main__":
     uvicorn.run(
@@ -98,3 +108,6 @@ if __name__ == "__main__":
         port=settings.PORT,
         reload=True
     )
+
+# For Vercel deployment
+handler = app

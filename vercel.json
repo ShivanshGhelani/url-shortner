@@ -29,8 +29,8 @@
     "HOST": "0.0.0.0",
     "PORT": "8000",
     "VERCEL": "1",
-    "BASE_URL": "https://shortyurl-woad.vercel.app
-"
+    "BASE_URL": "https://shortyurl-woad.vercel.app"
+
   },
   "functions": {
     "vercel_app.py": {

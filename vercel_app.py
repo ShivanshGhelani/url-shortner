@@ -100,5 +100,5 @@ async def startup_event():
     print("🚀 Universal URL Shortener started on Vercel!")
 
 # For Vercel deployment - use the correct handler format
-from mangum import Adapter
-handler = Adapter(app)
+from mangum import adapter
+handler = adapter(app)
